@@ -58,7 +58,8 @@ io.on('connection', (socket) => {
   const modules = eval(globalCode);
 
   // Send all modules to the client:
-  socket.emit('modules', { functions: Object.keys(modules) });
+  if (modules)
+    socket.emit('modules', { functions: Object.keys(modules) });
 
   socket.on('jsMethodCall', ({ method, args }) => {
     modules[method](...args);

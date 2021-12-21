@@ -16,6 +16,7 @@
           data[key] = value;
         }
 
+        // Submit my form data to the server
         handleFormSubmit(data.name, data.email);
       }
 
@@ -43,7 +44,6 @@
       <input type="text" name="email" placeholder="Email">
       <button type="submit">Submit</button>
     </form>
-
   </body>
 
 </html>
