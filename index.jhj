@@ -1,0 +1,62 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Home</title>
+  </head>
+
+  <script>
+    window.onload = function() {
+      function handleSubmit(e) {
+        const formData = new FormData(e.target);
+        const data = {};
+        for (var [key, value] of formData.entries()) {
+          data[key] = value;
+        }
+
+        call('handleFormSubmit', data.name, data.email);
+      }
+
+      const form = document.getElementById('form');
+      form.addEventListener('submit', handleSubmit);
+    }
+  </script>
+
+  <script serverside>
+    function handleFormSubmit(name, email) {
+      console.log(`Login user: ${name} ${email}`);
+    }
+
+    console.log('loaded')
+
+    module.exports = {
+      handleFormSubmit
+    };
+  </script>
+
+  <body>
+    <p>Hello world</p>
+    <form id="form" onsubmit="return false;">
+      <input type="text" name="name" placeholder="Name">
+      <input type="text" name="email" placeholder="Email">
+      <button type="submit">Submit</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      function call(method) {
+        socket.emit('jsMethodCall', { method, args: Object.values(arguments).slice(1, arguments.length) });
+      }
+      const jhj = {};
+
+      socket.on('modules', function(modules) {
+        console.log(modules)
+      });
+    </script>
+  </body>
+
+</html>
