@@ -27,30 +27,30 @@ const parseServerSideJs = (html) => {
   // Remove server-side code from client
   script.remove();
 
-  const socketWait = (funcName) => `
-    socket.on('${funcName}Response', function({ response }) {
-      return response;
-    })
+  // Inject transport layer
+  const evalBody = "window.${func} = function ${func}() {\n" +
+    "socket.emit('jsMethodCall', { method: '${func}', args: Object.values(arguments) });\n" +
+      "return new Promise((resolve, reject) => {\n" +
+        "socket.on('${func}Response', function({ response }) {\n" +
+          "resolve(response);\n" +
+        "});\n" +
+      "});\n" +
+    "};";
+
+  const socketIOBody = `
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      socket.on('modules', function({ functions }) {
+        functions.forEach(func => {
+          eval(\`${evalBody}\`)
+        });
+      });
+    </script>
   `;
 
-  // Inject transport layer
-  // const funcBody = "eval(`window.${func} = function ${func}() { socket.emit('jsMethodCall', { method: '${func}', args: Object.values(arguments) });" +
-  //   "return new Promise((resolve, reject) => {\n" +
-  //     "socket.on(`${func}Response`, function({ response }) {\n" +
-  //       "resolve(response);\n" +
-  //     "}))\n"
-  //   "})\n" +
-  // "}`);";
 
-  // root.querySelector('body').appendChild(parse(`
-  //   <script src="/socket.io/socket.io.js"></script>
-  //   <script>
-  //     const socket = io();
-  //     socket.on('modules', function({ functions }) {
-  //       functions.forEach(func => { ${funcBody} });
-  //     });
-  //   </script>
-  // `))
+  root.querySelector('body').appendChild(parse(socketIOBody))
 
   return { code, html: root.toString() };
 };
