@@ -8,8 +8,8 @@
   </head>
 
   <script>
-    window.onload = function() {
-      function handleSubmit(e) {
+    window.onload = async function() {
+      async function handleSubmit(e) {
         const formData = new FormData(e.target);
         const data = {};
         for (var [key, value] of formData.entries()) {
@@ -17,7 +17,8 @@
         }
 
         // Submit my form data to the server
-        handleFormSubmit(data.name, data.email);
+        const c = await handleFormSubmit(data.name, data.email)
+        console.log(c)
       }
 
       const form = document.getElementById('form');
@@ -28,6 +29,7 @@
   <script serverside>
     function handleFormSubmit(name, email) {
       console.log(`My name is: ${name} and my email is: ${email}`);
+      return 'Successfully logged in!';
     }
 
     console.log('loaded')
@@ -44,6 +46,24 @@
       <input type="text" name="email" placeholder="Email">
       <button type="submit">Submit</button>
     </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      socket.on('modules', function({ functions }) {
+        functions.forEach(func => {
+          eval(`window.${func} = function ${func}() {
+            socket.emit('jsMethodCall', { method: '${func}', args: Object.values(arguments) });
+            
+            return new Promise((resolve, reject) => {
+              socket.on('${func}Response', function({ response }) {
+                resolve(response);
+              });
+            });
+          };`)
+        });
+      });
+    </script>
   </body>
 
 </html>

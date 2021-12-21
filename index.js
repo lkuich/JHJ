@@ -27,16 +27,30 @@ const parseServerSideJs = (html) => {
   // Remove server-side code from client
   script.remove();
 
-  const funcBody = "eval(`window.${func} = function ${func}() {socket.emit('jsMethodCall', { method: '${func}', args: Object.values(arguments) });}`);";
-  root.querySelector('body').appendChild(parse(`
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      const socket = io();
-      socket.on('modules', function({ functions }) {
-        functions.forEach(func => { ${funcBody} });
-      });
-    </script>
-  `))
+  const socketWait = (funcName) => `
+    socket.on('${funcName}Response', function({ response }) {
+      return response;
+    })
+  `;
+
+  // Inject transport layer
+  // const funcBody = "eval(`window.${func} = function ${func}() { socket.emit('jsMethodCall', { method: '${func}', args: Object.values(arguments) });" +
+  //   "return new Promise((resolve, reject) => {\n" +
+  //     "socket.on(`${func}Response`, function({ response }) {\n" +
+  //       "resolve(response);\n" +
+  //     "}))\n"
+  //   "})\n" +
+  // "}`);";
+
+  // root.querySelector('body').appendChild(parse(`
+  //   <script src="/socket.io/socket.io.js"></script>
+  //   <script>
+  //     const socket = io();
+  //     socket.on('modules', function({ functions }) {
+  //       functions.forEach(func => { ${funcBody} });
+  //     });
+  //   </script>
+  // `))
 
   return { code, html: root.toString() };
 };
@@ -61,8 +75,9 @@ io.on('connection', (socket) => {
   if (modules)
     socket.emit('modules', { functions: Object.keys(modules) });
 
-  socket.on('jsMethodCall', ({ method, args }) => {
-    modules[method](...args);
+  socket.on('jsMethodCall', async ({ method, args }) => {
+    const response = await modules[method](...args);
+    socket.emit(`${method}Response`, { response });
   });
 
   socket.on('disconnect', () => {
