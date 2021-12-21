@@ -1,7 +1,6 @@
 const fs = require('fs').promises;
 const express = require('express');
 const app = express();
-const router = express.Router();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
@@ -51,7 +50,6 @@ const parseServerSideJs = (html) => {
       });
     </script>
   `;
-
 
   root.querySelector('body').appendChild(parse(socketIOBody))
 
