@@ -27,8 +27,16 @@ const parseServerSideJs = (html) => {
   // Remove server-side code from client
   script.remove();
 
-  // TODO: Add socket compatibility
-  // root.querySelector('body').appendChild('script', '<script>')
+  const funcBody = "eval(`window.${func} = function ${func}() {socket.emit('jsMethodCall', { method: '${func}', args: Object.values(arguments) });}`);";
+  root.querySelector('body').appendChild(parse(`
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      socket.on('modules', function({ functions }) {
+        functions.forEach(func => { ${funcBody} });
+      });
+    </script>
+  `))
 
   return { code, html: root.toString() };
 };

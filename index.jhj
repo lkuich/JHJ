@@ -44,18 +44,6 @@
       <button type="submit">Submit</button>
     </form>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      const socket = io();
-
-      socket.on('modules', function({ functions }) {
-        functions.forEach(func => {
-          eval(`window.${func} = function ${func}() {
-            socket.emit('jsMethodCall', { method: '${func}', args: Object.values(arguments) });
-          }`);
-        });
-      });
-    </script>
   </body>
 
 </html>
