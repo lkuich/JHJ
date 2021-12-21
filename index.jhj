@@ -16,7 +16,7 @@
           data[key] = value;
         }
 
-        call('handleFormSubmit', data.name, data.email);
+        handleFormSubmit(data.name, data.email);
       }
 
       const form = document.getElementById('form');
@@ -26,7 +26,7 @@
 
   <script serverside>
     function handleFormSubmit(name, email) {
-      console.log(`Login user: ${name} ${email}`);
+      console.log(`My name is: ${name} and my email is: ${email}`);
     }
 
     console.log('loaded')
@@ -48,13 +48,12 @@
     <script>
       const socket = io();
 
-      function call(method) {
-        socket.emit('jsMethodCall', { method, args: Object.values(arguments).slice(1, arguments.length) });
-      }
-      const jhj = {};
-
-      socket.on('modules', function(modules) {
-        console.log(modules)
+      socket.on('modules', function({ functions }) {
+        functions.forEach(func => {
+          eval(`window.${func} = function ${func}() {
+            socket.emit('jsMethodCall', { method: '${func}', args: Object.values(arguments) });
+          }`);
+        });
       });
     </script>
   </body>
