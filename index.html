@@ -5,6 +5,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>Home</title>
+
+    <link rel="stylesheet" href="style.css">
   </head>
 
   <script>
@@ -17,8 +19,8 @@
         }
 
         // Submit my form data to the server
-        const c = await handleFormSubmit(data.name, data.email)
-        console.log(c)
+        const resopnse = await handleFormSubmit(data.name, data.email)
+        console.log(resopnse)
       }
 
       const form = document.getElementById('form');
@@ -38,6 +40,8 @@
       handleFormSubmit
     };
   </script>
+
+  <!-- <script src="external.js" serverside></script> -->
 
   <body>
     <p>Hello world</p>

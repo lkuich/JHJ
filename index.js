@@ -1,6 +1,7 @@
 const fs = require('fs').promises;
 const express = require('express');
 const app = express();
+const router = express.Router();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
@@ -9,7 +10,7 @@ const { parse } = require('node-html-parser');
 
 console.log("Starting server...");
 
-const indexFile = 'index.jhj';
+const indexFile = 'index.html';
 
 const readJsj = (file) => {
   return fs.readFile(file, 'utf8');
@@ -21,6 +22,8 @@ const dir = args.length > 0 ? args[0] : '.';
 const parseServerSideJs = (html) => {
   const root = parse(html);
   const script = root.querySelector('script[serverside]');
+
+  if (script.childNodes.length === 0) return { code: '', html: root.toString() };
 
   const code = script.childNodes[0].rawText.trim();
 
@@ -56,6 +59,8 @@ const parseServerSideJs = (html) => {
 };
 
 let globalCode;
+
+app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
   const jsj = await readJsj(`${dir}/${indexFile}`);
