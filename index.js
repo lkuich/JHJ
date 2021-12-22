@@ -7,6 +7,7 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const { parse } = require('node-html-parser');
 const fetch = require('node-fetch');
+const path = require('path');
 
 const indexFile = 'src/index.html';
 
@@ -17,50 +18,7 @@ const readFile = (file) => {
 const args = process.argv.slice(2);
 const dir = args.length > 0 ? args[0] : '.';
 
-const parseHtmlTemplates = async (html) => {
-  const root = parse(html);
-  const body = root.querySelector('body');
-  const childBlocks = root.querySelectorAll('div[data-src]');
-  
-  for (const childBlock of childBlocks) {
-    const block = await readFile(`src/${childBlock.getAttribute('data-src')}`);
-    body.appendChild(parse(block));
-    childBlock.removeAttribute('data-src');
-  }
-
-  const moreBlocks = root.querySelectorAll('div[data-src]').length > 0;
-  if (moreBlocks) return parseHtmlTemplates(root.toString());
-
-  return root.toString();
-}
-
-const parseServerSideJs = async (html) => {
-  const root = parse(html);
-  const scripts = root.querySelectorAll('script[backend]');
-
-  const codeBlocks = await Promise.all(scripts.map(async s => {
-    const src = s.getAttribute('src');
-
-    let code;
-    if (src) {
-      if (src.startsWith('http')) {
-        const response = await fetch(src);
-        code = await response.text();
-      }
-      else
-        code = (await readFile(`src/${src}`)).trim();
-    } else {
-      code = s.childNodes[0].rawText.trim()
-    }
- 
-    // Remove server-side code from client
-    s.remove();
-
-    return code;
-  }));
-
-  if (codeBlocks.length === 0) return { code: '', html: root.toString() };
-
+const injectSocket = (body) => {
   // Inject transport layer
   const evalBody = "window.${func} = function ${func}() {\n" +
     "socket.emit('jsMethodCall', { method: '${func}', args: Object.values(arguments) });\n" +
@@ -83,23 +41,91 @@ const parseServerSideJs = async (html) => {
     </script>
   `;
 
-  root.querySelector('body').appendChild(parse(socketIOBody))
-
-  return { codeBlocks, html: root.toString() };
+  body.appendChild(parse(socketIOBody))
 };
 
-let globalCode = [];
+const parseRoot = async (index) => {
+  const root = parse(index);
+  const body = root.querySelector('body');
+
+  const { component, codeBlocks } = await parseTemplate(root, body);
+
+  injectSocket(body);
+
+  return { component, codeBlocks };
+};
+
+const parseTemplate = async (component, body, codeBlocks = [], subTree = []) => {
+  const childBlocks = component.querySelectorAll('div[data-src]');
+
+  for (block of childBlocks) {
+    // Pull out the contents of the block
+    const src = block.getAttribute('data-src');
+    const document = await readFile(`src/${subTree.join('/')}/${src}`);
+    const parsedDoc = parse(document);
+
+    // Extract the server-side code
+    codeBlocks.push(await parseServerSideJs(parsedDoc));
+
+    // Inject the contents of the block into the parent
+    block.appendChild(parsedDoc);
+
+    // Track where we are in the filetree
+    const dirname = path.dirname(src);
+    if (dirname !== '.')
+      subTree.push(dirname);
+
+    // Remove the src attribute
+    block.removeAttribute('data-src');
+  }
+
+  const moreBlocks = body.querySelectorAll('div[data-src]').length > 0;
+  if (moreBlocks) {
+    return parseTemplate(component, body, codeBlocks, subTree);
+  }
+
+  return { component, codeBlocks, subTree };
+}
+
+const parseServerSideJs = async (block) => {
+  const scripts = block.querySelectorAll('script[backend]');
+
+  const codeBlocks = await Promise.all(scripts.map(async s => {
+    const src = s.getAttribute('src');
+
+    let code;
+    if (src) {
+      if (src.startsWith('http')) {
+        const response = await fetch(src);
+        code = await response.text();
+      }
+      else
+        code = (await readFile(`src/${src}`)).trim();
+    } else {
+      code = s.childNodes[0].rawText.trim()
+    }
+ 
+    // Remove server-side code from client
+    s.remove();
+
+    return code;
+  }));
+
+  return codeBlocks.join('\n');
+};
+
 
 app.use(express.static('src/public'));
 
+let globalCode = [];
 app.get('/', async (req, res) => {
   const rootPage = await readFile(`${dir}/${indexFile}`);
-  const page = await parseHtmlTemplates(rootPage);
-  const { html, codeBlocks } = await parseServerSideJs(page);
+
+  const { component, codeBlocks } = await parseRoot(rootPage);
 
   globalCode = codeBlocks;
 
-  res.send(html);
+  res.send(component.toString());
 });
 
 io.on('connection', (socket) => {

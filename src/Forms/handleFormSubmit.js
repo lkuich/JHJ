@@ -3,6 +3,8 @@ function handleFormSubmit(name, email) {
   return `${name} successfully logged in!`;
 }
 
+console.log('helloworld')
+
 module.exports = {
   handleFormSubmit
 };
