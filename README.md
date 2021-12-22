@@ -17,8 +17,9 @@ Define a Backend function like so in your client page like so, the `script` bloc
     return `${name} successfully logged in!`;
   }
 
-  console.log('loaded');
+  console.log('Component loaded');
 
+  // Note we must export our functions!
   module.exports = {
     handleFormSubmit
   };
@@ -56,7 +57,70 @@ JHJ also supports basic templating, so you can re-use app components. In your `s
 
 At runtime, this will replace the `div` marked with `data-src` with the source of `app.html`. This is great for nesting and isolating certain server-side functionality to a specific component.
 
-See `src/index.html` and `src/app.html` for examples.
+## Examples
+
+See `src/index.html` and `src/app.html` for more complete examples. Here's an example of a complete app!
+
+```html
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Home</title>
+
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <p>Login Form</p>
+
+    <form id="form" onsubmit="return false;">
+      <input type="text" name="name" placeholder="Name">
+      <input type="text" name="email" placeholder="Email">
+      <button type="submit">Submit</button>
+    </form>
+    <div id="result"></div>
+
+    <script backend>
+      const mysql = require('mysql');
+
+      function handleFormSubmit(name, email) {
+        console.log(`My name is: ${name} and my email is: ${email}`);
+        // Retreive my users information from our database...
+        return `${name} successfully logged in!`;
+      }
+
+      module.exports = {
+        handleFormSubmit
+      };
+    </script>
+
+    <script>
+      window.onload = async function() {
+        async function handleSubmit(e) {
+          const formData = new FormData(e.target);
+          const data = {};
+          for (var [key, value] of formData.entries()) {
+            data[key] = value;
+          }
+
+          // Submit my form data to the server
+          const response = await handleFormSubmit(data.name, data.email)
+          console.log(response)
+
+          document.getElementById('result').innerHTML = response;
+        }
+
+        const form = document.getElementById('form');
+        form.addEventListener('submit', handleSubmit);
+      }
+    </script>
+  </body>
+
+</html>
+```
 
 ## TODO:
 - Support for routing
