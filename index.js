@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { app, server, renderJsj } = require('./jhj');
+const { app, server, renderJsj } = require('./lib/jhj');
 const routes = require('./routes');
 
 app.use(express.static('src/public'));
