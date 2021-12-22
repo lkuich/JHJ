@@ -70,7 +70,7 @@ const parseTemplate = async (component, body, codeBlocks = [], subTree = []) => 
       subTree.push(dirname);
     
     // Extract the server-side code
-    codeBlocks.push(await parseServerSideJs(parsedDoc, subTree));
+    codeBlocks.push(...(await parseServerSideJs(parsedDoc, subTree)));
 
     // Inject the contents of the block into the parent
     block.appendChild(parsedDoc);
@@ -111,7 +111,7 @@ const parseServerSideJs = async (block, subTree = []) => {
     return code;
   }));
 
-  return codeBlocks.join('\n');
+  return codeBlocks;
 };
 
 

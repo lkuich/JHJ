@@ -1,8 +1,6 @@
 # JHJ
 
-Proof of concept.. Don't use!
-
-![Im in danger](https://c.tenor.com/I6GFaw6IR3YAAAAC/chuckles-im-in-danger.gif)
+![No tears](https://m.media-amazon.com/images/I/61AXLjhl6OL._SL1007_.jpg)
 
 Bring your Backend into your Frontend, and don't worry about boilerplate communication API's!
 
@@ -103,9 +101,9 @@ See `src/index.html` and `src/app.html` for more complete examples. Here's an ex
             data[key] = value;
           }
 
-          // Submit my form data to the server
-          const response = await handleFormSubmit(data.name, data.email)
-          console.log(response)
+          // Submit form data to the server, and await the response from the socket
+          const response = await handleFormSubmit(data.name, data.email);
+          console.log(response);
 
           document.getElementById('result').innerHTML = response;
         }
