@@ -1,0 +1,32 @@
+<div>
+  <form id="form" onsubmit="return false;">
+    <input type="text" name="name" placeholder="Name">
+    <input type="text" name="email" placeholder="Email">
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script src="Forms/handleFormSubmit.js" backend></script>
+
+  <script>
+    window.onload = async function() {
+      async function handleSubmit(e) {
+        const formData = new FormData(e.target);
+        const data = {};
+        for (var [key, value] of formData.entries()) {
+          data[key] = value;
+        }
+
+        // Submit my form data to the server
+        const response = await handleFormSubmit(data.name, data.email)
+        console.log(response)
+
+        document.getElementById('result').innerHTML = response;
+      }
+
+      const form = document.getElementById('form');
+      form.addEventListener('submit', handleSubmit);
+    }
+  </script>
+</div>

@@ -17,6 +17,23 @@ const readFile = (file) => {
 const args = process.argv.slice(2);
 const dir = args.length > 0 ? args[0] : '.';
 
+const parseHtmlTemplates = async (html) => {
+  const root = parse(html);
+  const body = root.querySelector('body');
+  const childBlocks = root.querySelectorAll('div[data-src]');
+  
+  for (const childBlock of childBlocks) {
+    const block = await readFile(`src/${childBlock.getAttribute('data-src')}`);
+    body.appendChild(parse(block));
+    childBlock.removeAttribute('data-src');
+  }
+
+  const moreBlocks = root.querySelectorAll('div[data-src]').length > 0;
+  if (moreBlocks) return parseHtmlTemplates(root.toString());
+
+  return root.toString();
+}
+
 const parseServerSideJs = async (html) => {
   const root = parse(html);
   const scripts = root.querySelectorAll('script[backend]');
@@ -76,8 +93,9 @@ let globalCode = [];
 app.use(express.static('src/public'));
 
 app.get('/', async (req, res) => {
-  const jsj = await readFile(`${dir}/${indexFile}`);
-  const { html, codeBlocks } = await parseServerSideJs(jsj);
+  const rootPage = await readFile(`${dir}/${indexFile}`);
+  const page = await parseHtmlTemplates(rootPage);
+  const { html, codeBlocks } = await parseServerSideJs(page);
 
   globalCode = codeBlocks;
 

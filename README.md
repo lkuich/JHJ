@@ -45,8 +45,21 @@ Now, in your client script block, simply call your server function by name, as i
 </script>
 ```
 
+JHJ also supports basic templating, so you can re-use app components. In your `src/index.html` file:
+
+```html
+<body>
+  <p>Main body</p>
+  <div data-src="app.html"></div>
+</body>
+```
+
+At runtime, this will replace the `div` marked with `data-src` with the source of `app.html`. This is great for nesting and isolating certain server-side functionality to a specific component.
+
+See `src/index.html` and `src/app.html` for examples.
 
 ## TODO:
 - Support for routing
+- Add folder context for embedded scripts
 - Security scrutiny and sandboxing
-- HTML templating
+- Compile option for static site generation

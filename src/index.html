@@ -9,47 +9,9 @@
     <link rel="stylesheet" href="style.css">
   </head>
 
-  <script>
-    window.onload = async function() {
-      async function handleSubmit(e) {
-        const formData = new FormData(e.target);
-        const data = {};
-        for (var [key, value] of formData.entries()) {
-          data[key] = value;
-        }
-
-        // Submit my form data to the server
-        const response = await handleFormSubmit(data.name, data.email)
-        console.log(response)
-      }
-
-      const form = document.getElementById('form');
-      form.addEventListener('submit', handleSubmit);
-    }
-  </script>
-
-  <script backend>
-    function handleFormSubmit(name, email) {
-      console.log(`My name is: ${name} and my email is: ${email}`);
-      return `${name} successfully logged in!`;
-    }
-
-    console.log('loaded')
-
-    module.exports = {
-      handleFormSubmit
-    };
-  </script>
-
-  <script src="external.js" backend></script>
-
   <body>
-    <p>Hello world</p>
-    <form id="form" onsubmit="return false;">
-      <input type="text" name="name" placeholder="Name">
-      <input type="text" name="email" placeholder="Email">
-      <button type="submit">Submit</button>
-    </form>
+    <p>Main body</p>
+    <div data-src="app.html"></div>
   </body>
 
 </html>
