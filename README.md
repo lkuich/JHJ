@@ -44,7 +44,7 @@ Now, in your client script block, simply call your server function by name, as i
 </script>
 ```
 
-JHJ also supports basic templating, so you can re-use app components. In your `src/index.html` file:
+JHJ also supports basic templating, so you can re-use app components. For example, in your `src/index.html` file, you can pull in `src/app.html` like this:
 
 ```html
 <body>
@@ -53,7 +53,7 @@ JHJ also supports basic templating, so you can re-use app components. In your `s
 </body>
 ```
 
-At runtime, this will replace the `div` marked with `data-src` with the source of `app.html`. This is great for nesting and isolating certain server-side functionality to a specific component.
+At startup, this will replace the `div` marked with `data-src` with the source of `app.html`. This is great for nesting and isolating certain server-side functionality to a specific component.
 
 ## Examples
 
