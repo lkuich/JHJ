@@ -4,7 +4,7 @@
 
 Bring your Backend into your Frontend without tears; and don't worry about boilerplate communication API's!
 
-Define a Backend function like so in your client page like so, the `script` block marked as `backend`, this will be pulled out of the client and run on the server! Communication between the client and server is handled with websockets.
+Define a Backend function in your client page like so, the `script` block marked as `backend`, this will be pulled out of the client and run on the server! Communication between the client and server is handled with websockets.
 
 ```html
 <script backend>
