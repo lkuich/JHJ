@@ -1,13 +1,15 @@
 # JHJ
 
-Proof of concept.. Don't use..
+Proof of concept.. Don't use!
 
-Bring your backend into your Frontend, and don't worry about communication layers!
+![Im in danger](https://c.tenor.com/I6GFaw6IR3YAAAAC/chuckles-im-in-danger.gif)
 
-Define a backend function like so in your client (note the `script` blocked is marked as `serverside`, this will be pulled out an run on your server):
+Bring your Backend into your Frontend, and don't worry about boilerplate communication API's!
+
+Define a Backend function like so in your client page like so, the `script` block marked as `backend`, this will be pulled out of the client and run on the server! Communication between the client and server is handled with websockets.
 
 ```html
-<script serverside>
+<script backend>
   const mysql = require('mysql');
 
   function handleFormSubmit(name, email) {
@@ -15,7 +17,7 @@ Define a backend function like so in your client (note the `script` blocked is m
     return `${name} successfully logged in!`;
   }
 
-  console.log('loaded')
+  console.log('loaded');
 
   module.exports = {
     handleFormSubmit
@@ -23,7 +25,17 @@ Define a backend function like so in your client (note the `script` blocked is m
 </script>
 ```
 
-Now, in your client, simply call your server function as if it was available locally, and it retuns a promise!
+This also supports external files:
+
+```html
+<script src="external.js" backend></script>
+```
+
+```html
+<script src="https://mylibrary.com/external.js" backend></script>
+```
+
+Now, in your client script block, simply call your server function by name, as if it was available locally. Your function will return as a standard Promise.
 
 ```html
 <script>
@@ -33,7 +45,8 @@ Now, in your client, simply call your server function as if it was available loc
 </script>
 ```
 
-Socket.io is under the hood handling communication between the client and server.
 
 ## TODO:
 - Support for routing
+- Security scrutiny and sandboxing
+- HTML templating
