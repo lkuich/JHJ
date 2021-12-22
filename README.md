@@ -1,8 +1,8 @@
 # JHJ
 
-<img src="https://m.media-amazon.com/images/I/61AXLjhl6OL._SL1007_.jpg" height="280">
+<img src="https://m.media-amazon.com/images/I/61AXLjhl6OL._SL1007_.jpg" height="320">
 
-Bring your Backend into your Frontend, and don't worry about boilerplate communication API's!
+Bring your Backend into your Frontend without tears; and don't worry about boilerplate communication API's!
 
 Define a Backend function like so in your client page like so, the `script` block marked as `backend`, this will be pulled out of the client and run on the server! Communication between the client and server is handled with websockets.
 
