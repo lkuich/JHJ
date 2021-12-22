@@ -4,7 +4,7 @@
 
 Bring your Backend into your Frontend without tears; and don't worry about boilerplate communication API's!
 
-Define a Backend function like so in your client page like so, the `script` block marked as `backend`, this will be pulled out of the client and run on the server! Communication between the client and server is handled with websockets.
+Define a Backend function in your client page like so, the `script` block marked as `backend` will be pulled out of the client and run on the server! Communication between the client and server is handled with websockets.
 
 ```html
 <script backend>
@@ -44,7 +44,7 @@ Now, in your client script block, simply call your server function by name, as i
 </script>
 ```
 
-JHJ also supports basic templating, so you can re-use app components. In your `src/index.html` file:
+JHJ also supports basic templating, so you can re-use app components. For example, in your `src/index.html` file, you can pull in `src/app.html` like this:
 
 ```html
 <body>
@@ -53,7 +53,7 @@ JHJ also supports basic templating, so you can re-use app components. In your `s
 </body>
 ```
 
-At runtime, this will replace the `div` marked with `data-src` with the source of `app.html`. This is great for nesting and isolating certain server-side functionality to a specific component.
+At startup, this will replace the `div` marked with `data-src` with the source of `app.html`. This is great for nesting and isolating certain server-side functionality to a specific component.
 
 ## Examples
 
