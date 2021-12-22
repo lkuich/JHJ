@@ -28,8 +28,8 @@ Now, in your client, simply call your server function as if it was available loc
 ```html
 <script>
   // Submit my form data to the server
-  const resopnse = await handleFormSubmit(data.name, data.email)
-  console.log(resopnse)
+  const response = await handleFormSubmit(name, email)
+  console.log(response)
 </script>
 ```
 
@@ -37,5 +37,3 @@ Socket.io is under the hood handling communication between the client and server
 
 ## TODO:
 - Support for routing
-- Support for multiple `serverside` blocks
-- Support for external `serverside` blocks

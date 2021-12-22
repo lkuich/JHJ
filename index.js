@@ -6,28 +6,43 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 const { parse } = require('node-html-parser');
+const fetch = require('node-fetch');
 
-console.log("Starting server...");
+const indexFile = 'src/index.html';
 
-const indexFile = 'index.html';
-
-const readJsj = (file) => {
+const readFile = (file) => {
   return fs.readFile(file, 'utf8');
 };
 
 const args = process.argv.slice(2);
 const dir = args.length > 0 ? args[0] : '.';
 
-const parseServerSideJs = (html) => {
+const parseServerSideJs = async (html) => {
   const root = parse(html);
-  const script = root.querySelector('script[serverside]');
+  const scripts = root.querySelectorAll('script[backend]');
 
-  if (script.childNodes.length === 0) return { code: '', html: root.toString() };
+  const codeBlocks = await Promise.all(scripts.map(async s => {
+    const src = s.getAttribute('src');
 
-  const code = script.childNodes[0].rawText.trim();
+    let code;
+    if (src) {
+      if (src.startsWith('http')) {
+        const response = await fetch(src);
+        code = await response.text();
+      }
+      else
+        code = (await readFile(`src/${src}`)).trim();
+    } else {
+      code = s.childNodes[0].rawText.trim()
+    }
+ 
+    // Remove server-side code from client
+    s.remove();
 
-  // Remove server-side code from client
-  script.remove();
+    return code;
+  }));
+
+  if (codeBlocks.length === 0) return { code: '', html: root.toString() };
 
   // Inject transport layer
   const evalBody = "window.${func} = function ${func}() {\n" +
@@ -53,26 +68,24 @@ const parseServerSideJs = (html) => {
 
   root.querySelector('body').appendChild(parse(socketIOBody))
 
-  return { code, html: root.toString() };
+  return { codeBlocks, html: root.toString() };
 };
 
-let globalCode;
+let globalCode = [];
 
-app.use(express.static('public'));
+app.use(express.static('src/public'));
 
 app.get('/', async (req, res) => {
-  const jsj = await readJsj(`${dir}/${indexFile}`);
-  const { html, code } = parseServerSideJs(jsj);
+  const jsj = await readFile(`${dir}/${indexFile}`);
+  const { html, codeBlocks } = await parseServerSideJs(jsj);
 
-  globalCode = code;
+  globalCode = codeBlocks;
 
   res.send(html);
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
-
-  const modules = eval(globalCode);
+  const modules = eval(globalCode.join(''));
 
   // Send all modules to the client:
   if (modules)
@@ -84,7 +97,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    // Any cleanup needed
   });
 });
 

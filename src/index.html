@@ -19,8 +19,8 @@
         }
 
         // Submit my form data to the server
-        const resopnse = await handleFormSubmit(data.name, data.email)
-        console.log(resopnse)
+        const response = await handleFormSubmit(data.name, data.email)
+        console.log(response)
       }
 
       const form = document.getElementById('form');
@@ -28,7 +28,7 @@
     }
   </script>
 
-  <script serverside>
+  <script backend>
     function handleFormSubmit(name, email) {
       console.log(`My name is: ${name} and my email is: ${email}`);
       return `${name} successfully logged in!`;
@@ -41,7 +41,7 @@
     };
   </script>
 
-  <!-- <script src="external.js" serverside></script> -->
+  <script src="external.js" backend></script>
 
   <body>
     <p>Hello world</p>
