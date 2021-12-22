@@ -1,8 +1,8 @@
 # JHJ
 
-<img src="https://m.media-amazon.com/images/I/61AXLjhl6OL._SL1007_.jpg" height="320">
+<img src="https://user-images.githubusercontent.com/7741982/147153729-8e75d42b-d818-40c8-8922-ecf3143fe6d1.gif">
 
-Bring your Backend into your Frontend without tears; and don't worry about boilerplate communication API's!
+Bring your Backend into your Frontend; and don't worry about boilerplate communication API's! What could go wrong!
 
 Define a Backend function in your client page like so, the `script` block marked as `backend` will be pulled out of the client and run on the server! Communication between the client and server is handled with websockets.
 
@@ -34,7 +34,7 @@ This also supports external files:
 <script src="https://mylibrary.com/external.js" backend></script>
 ```
 
-Now, in your client script block, simply call your server function by name, as if it was available locally. Your function will return as a standard Promise.
+Now, in your client script block, simply call your server function by name, as if it was available locally. Your server function will return as a standard Promise.
 
 ```html
 <script>
@@ -57,7 +57,7 @@ At startup, this will replace the `div` marked with `data-src` with the source o
 
 ## Examples
 
-See `src/index.html` and `src/app.html` for more complete examples. Here's an example of a complete app!
+See `src/index.html` and `src/app.html` for more complete examples. Here's an example of an app!
 
 ```html
 <html lang="en">
@@ -101,10 +101,12 @@ See `src/index.html` and `src/app.html` for more complete examples. Here's an ex
             data[key] = value;
           }
 
+          // The exported function signature was sent back and stored in the client
           // Submit form data to the server, and await the response from the socket
           const response = await handleFormSubmit(data.name, data.email);
+      
+          // We got our response!
           console.log(response);
-
           document.getElementById('result').innerHTML = response;
         }
 
