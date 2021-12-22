@@ -64,16 +64,16 @@ const parseTemplate = async (component, body, codeBlocks = [], subTree = []) => 
     const document = await readFile(`src/${subTree.join('/')}/${src}`);
     const parsedDoc = parse(document);
 
-    // Extract the server-side code
-    codeBlocks.push(await parseServerSideJs(parsedDoc));
-
-    // Inject the contents of the block into the parent
-    block.appendChild(parsedDoc);
-
     // Track where we are in the filetree
     const dirname = path.dirname(src);
     if (dirname !== '.')
       subTree.push(dirname);
+    
+    // Extract the server-side code
+    codeBlocks.push(await parseServerSideJs(parsedDoc, subTree));
+
+    // Inject the contents of the block into the parent
+    block.appendChild(parsedDoc);
 
     // Remove the src attribute
     block.removeAttribute('data-src');
@@ -87,7 +87,7 @@ const parseTemplate = async (component, body, codeBlocks = [], subTree = []) => 
   return { component, codeBlocks, subTree };
 }
 
-const parseServerSideJs = async (block) => {
+const parseServerSideJs = async (block, subTree = []) => {
   const scripts = block.querySelectorAll('script[backend]');
 
   const codeBlocks = await Promise.all(scripts.map(async s => {
@@ -100,7 +100,7 @@ const parseServerSideJs = async (block) => {
         code = await response.text();
       }
       else
-        code = (await readFile(`src/${src}`)).trim();
+        code = (await readFile(`src/${subTree.join('/')}/${src}`)).trim();
     } else {
       code = s.childNodes[0].rawText.trim()
     }

@@ -60,6 +60,5 @@ See `src/index.html` and `src/app.html` for examples.
 
 ## TODO:
 - Support for routing
-- Add folder context for embedded scripts
 - Security scrutiny and sandboxing
 - Compile option for static site generation
