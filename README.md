@@ -1,6 +1,6 @@
 # JHJ
 
-![No tears](https://m.media-amazon.com/images/I/61AXLjhl6OL._SL1007_.jpg)
+<img src="https://m.media-amazon.com/images/I/61AXLjhl6OL._SL1007_.jpg" height="280">
 
 Bring your Backend into your Frontend, and don't worry about boilerplate communication API's!
 
