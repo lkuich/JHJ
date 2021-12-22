@@ -1,6 +1,6 @@
 # JHJ
 
-<img src="https://user-images.githubusercontent.com/7741982/147153729-8e75d42b-d818-40c8-8922-ecf3143fe6d1.gif" height="320">
+<img src="https://user-images.githubusercontent.com/7741982/147153729-8e75d42b-d818-40c8-8922-ecf3143fe6d1.gif">
 
 Bring your Backend into your Frontend; and don't worry about boilerplate communication API's! What could go wrong!
 
