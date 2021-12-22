@@ -118,6 +118,5 @@ See `src/index.html` and `src/app.html` for more complete examples. Here's an ex
 ```
 
 ## TODO:
-- Support for routing
 - Security scrutiny and sandboxing
 - Compile option for static site generation

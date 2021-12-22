@@ -1,4 +1,4 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -9,14 +9,19 @@ const { parse } = require('node-html-parser');
 const fetch = require('node-fetch');
 const path = require('path');
 
-const indexFile = 'src/index.html';
+const findIndexRoutes = () => {
+  return fs.readdirSync('src').filter(f => !f.startsWith('_') && f.endsWith('.html')).map(file => {
+    const route = `/${file.replace('.html', '')}`;
 
-const readFile = (file) => {
-  return fs.readFile(file, 'utf8');
+    if (route === '/index') return { route: '/', file };
+    else
+      return { route, file };
+  });
 };
 
-const args = process.argv.slice(2);
-const dir = args.length > 0 ? args[0] : '.';
+const readFile = (file) => {
+  return fs.readFileSync(file, 'utf8');
+};
 
 const injectSocket = (body) => {
   // Inject transport layer
@@ -60,8 +65,10 @@ const parseTemplate = async (component, body, codeBlocks = [], subTree = []) => 
 
   for (block of childBlocks) {
     // Pull out the contents of the block
-    const src = block.getAttribute('data-src');
-    const document = await readFile(`src/${subTree.join('/')}/${src}`);
+    let src = block.getAttribute('data-src');
+    if (!src.endsWith('.html')) src += '.html';
+
+    const document = readFile(`src/${subTree.join('/')}/${src}`);
     const parsedDoc = parse(document);
 
     // Track where we are in the filetree
@@ -91,7 +98,8 @@ const parseServerSideJs = async (block, subTree = []) => {
   const scripts = block.querySelectorAll('script[backend]');
 
   const codeBlocks = await Promise.all(scripts.map(async s => {
-    const src = s.getAttribute('src');
+    let src = s.getAttribute('src');
+    if (!src.endsWith('.js')) src += '.js';
 
     let code;
     if (src) {
@@ -100,7 +108,7 @@ const parseServerSideJs = async (block, subTree = []) => {
         code = await response.text();
       }
       else
-        code = (await readFile(`src/${subTree.join('/')}/${src}`)).trim();
+        code = readFile(`src/${subTree.join('/')}/${src}`).trim();
     } else {
       code = s.childNodes[0].rawText.trim()
     }
@@ -114,19 +122,20 @@ const parseServerSideJs = async (block, subTree = []) => {
   return codeBlocks;
 };
 
-
 app.use(express.static('src/public'));
 
 let globalCode = [];
-app.get('/', async (req, res) => {
-  const rootPage = await readFile(`${dir}/${indexFile}`);
 
-  const { component, codeBlocks } = await parseRoot(rootPage);
-
-  globalCode = codeBlocks;
-
-  res.send(component.toString());
-});
+for (const { route, file } of findIndexRoutes()) {
+  app.get(route, async (req, res) => {
+    const rootPage = await readFile(`src/${file}`);
+    const { component, codeBlocks } = await parseRoot(rootPage);
+  
+    globalCode = codeBlocks;
+  
+    res.send(component.toString());
+  });
+}
 
 io.on('connection', (socket) => {
   const modules = eval(globalCode.join(''));
