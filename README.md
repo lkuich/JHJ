@@ -55,8 +55,8 @@ Now, add another script block and simply call your server function by name, as i
 
 <script>
   // Submit my form data to the server
-  const response = await handleFormSubmit(name, email)
-  console.log(response)
+  const response = await handleFormSubmit(name, email);
+  console.log(response);
 </script>
 ```
 
