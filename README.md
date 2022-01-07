@@ -77,7 +77,7 @@ At startup, this will replace the `div` marked with `data-src` with the source o
 - Place your HTML files in `src/`
 - Files placed in `public/` will be served statically
 - Define Express routes in `lib/routes.js`, and point to your entry HTML document
-- Run the project with: `yarn start`
+- Run the project with: `yarn debug`
 - You can further configure the Express server in `index.js`
 
 ## Examples
