@@ -10,8 +10,6 @@
   </head>
 
   <body>
-    <!-- <p>Main body</p> -->
-
     <script src="pbj.js"></script>
     <script>
       const app = App(document.body, {
@@ -22,6 +20,7 @@
 
       // Set state in component
       function Home({ name = 'test' }) {
+
         return Div({ children: [
           P({ text: `Hello ${name}!` }),
           (setState) => Button({ text: "Change name..", onClick: () => {
@@ -43,6 +42,7 @@
                 PRow({ fistText: "world 1", secondText: "world 2" })
               );
             }}),
+            GObject('input', { type: 'text', value: 'test' })
           ]
         });
       }
