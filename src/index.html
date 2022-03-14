@@ -10,7 +10,29 @@
   </head>
 
   <body>
-    <p>Main body</p>
+    <!-- <p>Main body</p> -->
+
+    <script src="pbj.js"></script>
+    <script>
+      const app = App(document.body, {
+        children: [
+          Home
+        ]
+      });
+
+      function Home({ name = 'test' }) {
+        return Div({ children: [
+          () => {
+            return P({ text: `Hello ${name}!` })
+          },
+          (setState) => Button({ text: "Change name..", onClick: () => {
+            setState(
+              Home({ name: "world2" })
+            );
+          }})
+        ]});
+      }
+    </script>
 
     <div data-src="forms/nameEmail.html"></div>
   </body>
