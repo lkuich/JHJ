@@ -20,17 +20,31 @@
         ]
       });
 
+      // Set state in component
       function Home({ name = 'test' }) {
         return Div({ children: [
-          () => {
-            return P({ text: `Hello ${name}!` })
-          },
+          P({ text: `Hello ${name}!` }),
           (setState) => Button({ text: "Change name..", onClick: () => {
             setState(
               Home({ name: "world2" })
             );
-          }})
+          }}),
+          PRow
         ]});
+      }
+
+      function PRow({ fistText = "row 1", secondText = "row 2" }) {
+        return Div({
+          children: [
+            P({ text: fistText, props: { class: "row-1" } }),
+            P({ text: secondText }),
+            (setState) => Button({ text: "Change rows..", onClick: () => {
+              setState(
+                PRow({ fistText: "world 1", secondText: "world 2" })
+              );
+            }}),
+          ]
+        });
       }
     </script>
 

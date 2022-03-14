@@ -13,7 +13,7 @@ function App(_body, { children }) {
 
 function Div({ children, props }) {
   const frag = document.createDocumentFragment();
-  const div = document.createElement('div');
+  const div = GObject('div', props);
 
   for (const child of children) {
     if (typeof child === 'function') {
@@ -21,13 +21,6 @@ function Div({ children, props }) {
     }
     else
       frag.append(child);
-  }
-
-
-  for (const propName in props) {
-    if (props.hasOwnProperty(propName)) {
-      div.setAttribute(propName, props[propName]);
-    }
   }
 
   div.appendChild(frag);
@@ -41,30 +34,27 @@ function Div({ children, props }) {
 }
 
 function P({ text, props }) {
-  const p = document.createElement('p');
+  const p = GObject('p', props);
   
-  for (const propName in props) {
-    if (props.hasOwnProperty(propName)) {
-      p.setAttribute(propName, props[propName]);
-    }
-  }
-
-  p.innerHTML = text;
+  p.innerText = text;
 
   return p;
 }
 
 function Button({ text, onClick, props }) {
-  const button = document.createElement('button');
-  
-  for (const propName in props) {
-    if (props.hasOwnProperty(propName)) {
-      button.setAttribute(propName, props[propName]);
-    }
-  }
+  const button = GObject('button', props);
 
   button.innerText = text;
   button.onclick = onClick;
 
   return button;
+}
+
+function GObject(type, props) {
+  const go = document.createElement(type);
+  for (const propName in props) {
+    go.setAttribute(propName, props[propName]);
+  }
+
+  return go;
 }
