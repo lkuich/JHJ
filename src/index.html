@@ -7,48 +7,105 @@
     <title>Home</title>
 
     <link rel="stylesheet" href="style.css">
+
+
+    <script type="module">
+      import { App, Img, Span, Button, Nbsp, Frag } from 'https://unpkg.com/flub.js/dist/core.js';
+      import { Row, Btn, Text, Link, Column, Box, ManagedForm, TextInput } from 'https://unpkg.com/flub.js/dist/components.js';
+
+      const flubGithub = 'https://github.com/lkuich/flub.js';
+
+      App(document.body, { children: [
+        Span({ class: 'fork-me', children: [
+          Link('Try Flub.js on GitHub!', flubGithub, { target: '_blank' }),
+        ]}),
+        Main
+      ]});
+
+      function Main({ search }, { setState }) {
+        return Column([
+          Heading,
+
+          ManagedForm({
+            name: 'search-form',
+            class: 'search-form',
+            children: [
+              Button({ text: "Search", type: 'submit' })
+            ]
+          }, {
+            fields: [
+              TextInput({ name: 'search', placeholder: 'Search', class: 'search-input' })
+            ],
+            onSubmit: (e, formData) => setState(formData)
+          }),
+
+          RecommendedSearches(setState),
+
+          (_, hooks) => SearchResults({ ..._, search }, hooks)
+        ], { alignItems: 'center' });
+      }
+
+      function Heading() {
+        return Column([
+          Text([
+            'SnapShot in',
+            Nbsp(),
+            Link('flub.js', flubGithub, { target: '_blank' })
+          ], { type: 'h1' }),
+          Text([
+            "Based off of: ",
+            Nbsp(),
+            Link('SnapShot React', 'https://github.com/Yog9/SnapShot', { target: '_blank' })
+          ]),
+        ], { alignItems: 'center' });
+      }
+
+      function RecommendedSearches(setSearch) {
+        return Row([
+          Btn('Mountains', () => setSearch({ search: 'mountains' })),
+          Btn('Beaches', () => setSearch({ search: 'beaches' })),
+          Btn('Birds', () => setSearch({ search: 'birds' })),
+          Btn('Food', () => setSearch({ search: 'food' }))
+        ], { gap: '12px' });
+      }
+
+      function SearchResults({ search = 'mountains', images = [] }, { setState, useCreation }) {
+        useCreation(async () => {
+          if (search) {
+            const images = await flickrSearch({ search: search.toLowerCase() })
+            setState({ images });
+          }
+        });
+
+        return Column([
+          search && Text(`${search} Images`, { type: 'h2' }),
+          Box(images.map(src =>
+            Link(Img({ src }), src, { target: '_blank' })
+          ), { class: 'grid' }),
+          images.length === 0 && Text('No images found', { type: 'h3' })
+        ], { gap: '12px', alignItems: 'center' });
+      }
+    </script>
+    <!-- <script backend>
+      console.log('flickr')
+      function flickrSearch({ search }) {
+        console.log(search)
+        const key = '636e1481b4f3c446d26b8eb6ebfe7127'; // process.env.FLICKR_API_KEY;
+        return fetch(`https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${key}&tags=${search}&format=json&nojsoncallback=1`)
+          .then(res => res.json())
+          .then(res => res.photos.photo.map(photo => `https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg`))
+      }
+      module.exports = { flickrSearch }
+    </script> -->
+
+    <script backend type="module">
+      export function sample() {
+        console.log('sample')
+      }
+    </script>
   </head>
 
   <body>
-    <script src="pbj.js"></script>
-    <script>
-      const app = App(document.body, {
-        children: [
-          Home
-        ]
-      });
-
-      // Set state in component
-      function Home({ name = 'test' }) {
-
-        return Div({ children: [
-          P({ text: `Hello ${name}!` }),
-          (setState) => Button({ text: "Change name..", onClick: () => {
-            setState(
-              Home({ name: "world2" })
-            );
-          }}),
-          PRow
-        ]});
-      }
-
-      function PRow({ fistText = "row 1", secondText = "row 2" }) {
-        return Div({
-          children: [
-            P({ text: fistText, props: { class: "row-1" } }),
-            P({ text: secondText }),
-            (setState) => Button({ text: "Change rows..", onClick: () => {
-              setState(
-                PRow({ fistText: "world 1", secondText: "world 2" })
-              );
-            }}),
-            GObject('input', { type: 'text', value: 'test' })
-          ]
-        });
-      }
-    </script>
-
-    <div data-src="forms/nameEmail.html"></div>
   </body>
 
 </html>

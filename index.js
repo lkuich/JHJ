@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 
-const { app, server, runServer } = require('./lib/jhj');
+import { app, server, runServer } from './lib/jhj.js';
 
 app.use(express.static('src/public'));
 
