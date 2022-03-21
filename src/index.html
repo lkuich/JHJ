@@ -90,12 +90,12 @@
 
     <script backend>
       function flickrSearch({ search }) {
-        const key = '636e1481b4f3c446d26b8eb6ebfe7127'; // process.env.FLICKR_API_KEY;
+        // Since this block runs server-side, we can use server env vars
+        const key = process.env.FLICKR_API_KEY;
         return fetch(`https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${key}&tags=${search}&format=json&nojsoncallback=1`)
           .then(res => res.json())
           .then(res => res.photos.photo.map(photo => `https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg`))
       }
-
       module.exports = { flickrSearch }
     </script>
   </body>
